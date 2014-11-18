@@ -18,17 +18,17 @@ shinyUI(fluidPage(
       textInput('visitors.B', label = 'Visitors B', 100),
       textInput('conversions.A', label = 'Conversions A', 50),
       textInput('conversions.B', label = 'Conversions B', 50),
-      textInput('samples', label = 'Samples', '100000'),
-      checkboxInput(inputId = 'showPlot', label = 'Show Plot', value = FALSE)
+      textInput('samples', label = 'Samples', '10000'),
+      checkboxInput(inputId = 'showPlot', label = 'Show Plot', value = TRUE)
     ),
     # Show a plot of the generated distribution
     mainPanel(
-      #plotOutput("distPlot")
-      h3('chance a is bigger than b'),
-      textOutput('proportion.A.bigger.than.B'),
+      h3('chance a is bigger than b', textOutput( 'proportion.A.bigger.than.B')),
       dataTableOutput('table'),
       conditionalPanel(condition = 'input.showPlot == true && input.samples < 100000',
-                       plotOutput('A.less.B.plot', height = 600)),
+                       plotOutput('A.less.B.plot', height = 600)),      
+      conditionalPanel(condition = 'input.showPlot == true && input.samples < 100000',
+                       plotOutput('A.less.B.hist', height = 600)),
       conditionalPanel(condition = 'input.showPlot == true && input.samples >= 100000',
                        h3("can't show plot when samples are over 100,000"))
     )
