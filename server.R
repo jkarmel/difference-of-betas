@@ -25,7 +25,7 @@ shinyServer(function(input, output) {
     prior.params.B = c(1,1)
     beta.A = rbeta(num.simulations, successes.A + prior.params.A[1], failures.A + prior.params.A[2])
     beta.B = rbeta(num.simulations, successes.B + prior.params.B[1], failures.B + prior.params.B[2])
-    sort((beta.A - beta.B)/beta.A)
+    sort((beta.A - beta.B)/beta.B)
   }
   
   samples = reactive({strtoi(input$samples)})
@@ -36,6 +36,14 @@ shinyServer(function(input, output) {
     n.B = strtoi(input$visitors.B)
     diff.of.betas(n.A, n.B, successes.A, successes.B, samples())
   })
+
+  rel.difference.of.betas = reactive({
+    successes.A = strtoi(input$conversions.A)
+    successes.B = strtoi(input$conversions.B)
+    n.A = strtoi(input$visitors.A)
+    n.B = strtoi(input$visitors.B)
+    rel.diff.of.betas(n.A,n.B,successes.A,successes.B,samples())
+  })
   
   output$proportion.A.bigger.than.B = renderText({
     times.A.bigger.than.B = sum(difference.of.betas() > 0)
@@ -44,10 +52,7 @@ shinyServer(function(input, output) {
   
   percentiles = c(.01, .05, .1, .25, .5, .75, .90, .95, .99)  
   chance.at.point = reactive({  difference.of.betas()[percentiles * samples()]  })
-  improvement = reactive({ 
-    proportion.B =  strtoi(input$conversions.B) /  strtoi(input$visitors.B)
-    improvement =  chance.at.point()/ proportion.B
-  })
+  improvement = reactive({ rel.difference.of.betas()[percentiles * samples()] })
   output$table = renderDataTable({
     frame = data.frame(percent(percentiles), percent(chance.at.point()), percent(improvement()))
     colnames(frame) = c('Percentile', 'Expected Gain/Loss', 'Expected Percentage Gain/Loss')
